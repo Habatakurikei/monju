@@ -1,0 +1,6 @@
+setuptools
+wheel
+twine
+flake8
+pytest
+llmmaster

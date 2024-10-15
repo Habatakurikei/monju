@@ -1,0 +1,5 @@
+llmmaster>=0.8.0
+
+[dev]
+pytest>=6.0
+flake8>=6.0

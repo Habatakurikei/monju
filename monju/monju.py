@@ -65,10 +65,10 @@ class Monju:
            not isinstance(kwargs.get(KEY_IDEAS), int)):
             kwargs[KEY_IDEAS] = DEFAULT_IDEAS
         if (kwargs.get(KEY_FREEDOM, None) is None or
-              not isinstance(kwargs.get(KEY_FREEDOM), float)):
+           not isinstance(kwargs.get(KEY_FREEDOM), float)):
             kwargs[KEY_FREEDOM] = DEFAULT_FREEDOM
         if (kwargs.get(KEY_LANGUAGE, None) is None or
-              not isinstance(kwargs.get(KEY_LANGUAGE), str)):
+           not isinstance(kwargs.get(KEY_LANGUAGE), str)):
             kwargs[KEY_LANGUAGE] = DEFAULT_LANGUAGE
 
         self.api_keys = api_keys

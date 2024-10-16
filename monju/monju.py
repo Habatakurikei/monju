@@ -64,10 +64,10 @@ class Monju:
         if (kwargs.get(KEY_IDEAS, None) is None or
            not isinstance(kwargs.get(KEY_IDEAS), int)):
             kwargs[KEY_IDEAS] = DEFAULT_IDEAS
-        elif (kwargs.get(KEY_FREEDOM, None) is None or
+        if (kwargs.get(KEY_FREEDOM, None) is None or
               not isinstance(kwargs.get(KEY_FREEDOM), float)):
             kwargs[KEY_FREEDOM] = DEFAULT_FREEDOM
-        elif (kwargs.get(KEY_LANGUAGE, None) is None or
+        if (kwargs.get(KEY_LANGUAGE, None) is None or
               not isinstance(kwargs.get(KEY_LANGUAGE), str)):
             kwargs[KEY_LANGUAGE] = DEFAULT_LANGUAGE
 

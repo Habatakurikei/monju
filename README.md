@@ -32,7 +32,9 @@ Each step is implemented as a method in the `Monju` class.
 
 For the general approach to brainstorming, see [Brainstorming - Wikipedia](https://en.wikipedia.org/wiki/Brainstorming).
 
-Both mindmap and class diagram are described in mermaid format. Output can be drawn by any mermaid-compatible tools mainly in JavaScript.
+Both mindmap and class diagram are described in mermaid format. Output can be drawn by any mermaid-compatible tools mainly in JavaScript, e.g. [Mermaid Live Editor](https://mermaid.live/).
+
+## KJ method (Affinity Diagram)
 
 In Japan, another popular ideation tool "KJ method" is often used as part of brainstorming. This method might be known as "affinity diagram" in English.
 
@@ -55,7 +57,7 @@ pip install monju
 - Python 3.10 or later
 - API keys for the LLM providers
 
-This library uses `LLMMaster`, a unified interface to access major LLM providers. Set API keys following the instructions in my another repository [LLM Master](https://github.com/Habatakurikei/llmmaster).
+This library uses `LLMMaster`, a unified interface to access major LLM providers. Set API keys following the instructions from [LLM Master](https://github.com/Habatakurikei/llmmaster), another repository by the same author.
 
 ## Usage
 
@@ -65,6 +67,7 @@ Here's a basic example of how to use monju:
 
 ```python
 import json
+
 from pathlib import Path
 from monju import Monju
 
@@ -88,7 +91,7 @@ bs = Monju(api_keys=API_KEY, verbose=True, **params)
 bs.brainstorm()
 
 # Show the results
-print(f'Result:\n{json.dumps(bs.record, indent=2)}')
+print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
 ```
 
 ### Step-by-Step Execution
@@ -99,6 +102,7 @@ The following example works equivalently to the batch execution example above.
 
 ```python
 import json
+
 from pathlib import Path
 from monju import Monju
 
@@ -130,7 +134,7 @@ bs.verify()
 print(f"Status: {bs.status}")
 
 # Show the results
-print(f'Result:\n{json.dumps(bs.record, indent=2)}')
+print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
 ```
 
 Types of `bs.status` are explained in later section.
@@ -142,7 +146,7 @@ There are several parameters to set for `Monju` class:
 - System parameters:
   - `api_keys` (str) **required**: API keys for LLMs in `LLMMaster` manner
   - `verbose` (bool): print progress for debugging, default is `False`
-- Brainstorming parameters:
+- Brainstorming parameters `params`:
   - `theme` (str) **required**: theme or topic of brainstorming, a.k.a. prompt
   - `ideas` (int): number of ideas to generate by each LLM
   - `freedom` (float): value of freedom-looking thinking for each LLM, a.k.a. temperature, between 0 and 1
@@ -244,7 +248,7 @@ The `record` object contains the following information:
   - `class_diagram`: LLM information used for class diagram generation.
   - `idea_evaluation`: LLM information used for idea evaluation.
 - `output`: Output results of the brainstorming process.
-  - `elapsed_time`: Elapsed time for each LLM provider.
+  - `elapsed_time`: Elapsed time for each step: (1) idea generation, (2) mindmap and class diagram generation, (3) idea evaluation in this order.
   - `ideas`: Generated ideas in dictionary format if multiple LLMs are used.
   - `mindmap`: Mindmap of the generated ideas in mermaid format.
   - `class_diagram`: Class diagram of the generated ideas in mermaid format.
@@ -259,32 +263,34 @@ There are many calls of `print` in the step-by-step example. Each print shows a 
 Types of `bs.status` are as follows:
 
 - `not_started`: The brainstorming process has not started. Most of cases, this status is shown when the instance of `Monju` is created.
-- `idea_generation`: Generating ideas finished.
-- `idea_organization`: Organizing ideas in mindmap and class diagram finished.
-- `idea_evaluation`: Evaluating ideas finished.
-- `verifying`: Verifying if all the outputs are generated.
+- `idea_generation`: Generating ideas in progress or finished.
+- `idea_organization`: Organizing ideas in mindmap and class diagram in progress or finished.
+- `idea_evaluation`: Evaluating ideas in progress or finished.
+- `verifying`: Verifying if all the outputs are generated in progress or finished.
 - `done`: The brainstorming process is completed.
-- `failed`: The brainstorming process is failed in some process.
+- `failed`: The brainstorming process is failed at some step.
 
 ## Supported LLM Providers
 
 One of the most important features of `Monju` is to generate ideas from multiple LLMs.
 
-`Monju` currently sets the following LLM providers as default of idea generation:
+`Monju` currently sets the following LLM providers as default of idea generation and evaluation:
 
-- OpenAI
-- Anthropic
-- Google
+- OpenAI: `gpt-4o-mini`
+- Anthropic: `claude-3-haiku-20240307`
+- Google: `gemini-1.5-flash`
 
-In fact, LLM is called in these steps:
+And OpenAI `gpt-4o` is used for mindmap and class diagram generation.
+
+Monju is capable of single or multiple LLMs for each step:
 
 - Generate ideas (multiple/single LLM)
 - Organize ideas in mindmap and class diagram (single LLM)
 - Evaluate ideas (multiple/single LLM)
 
-You can configure which providers and models to use for each step. Edit the `config.py` file. Any single LLM can be set for any steps.
+You can configure which providers and models to use for each step. Set arguments of LLM information in `params` dictionary when call `generate_ideas(**params)`, `organize_ideas(**params)`, and `evaluate_ideas(**params)`. Not possible for `verify()` and `brainstorming()`.
 
-Note that providers are limited as defined in `LLMMaster` class.
+Note that providers are not limited to those shown above. Also possible to user other providers like MistralAI, Groq, and so on, as long as they are defined in `LLMMaster` class.
 
 ## Contributing
 

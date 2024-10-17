@@ -49,13 +49,17 @@ LLM_IDEA_GENERATION = {
 }
 
 LLM_MINDMAP = {
-    'provider': KEY_OPENAI,
-    'model': 'gpt-4o'
+    KEY_MINDMAP: {
+        'provider': KEY_OPENAI,
+        'model': 'gpt-4o'
+    }
 }
 
 LLM_CLASS_DIAGRAM = {
-    'provider': KEY_OPENAI,
-    'model': 'gpt-4o'
+    KEY_CLASS_DIAGRAM: {
+        'provider': KEY_OPENAI,
+        'model': 'gpt-4o'
+    }
 }
 
 LLM_IDEA_EVALUATION = {

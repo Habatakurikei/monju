@@ -49,8 +49,8 @@ class Monju:
           System parameters:
             api_keys (str): API keys for LLMs in LLMMaster manner
             verbose (bool): print progress for debugging
-          Brainstorming parameters:
-            theme (str): theme or topic of brainstorming
+          Brainstorming parameters as kwargs:
+            theme (str) (required): theme or topic of brainstorming
             ideas (int): number of ideas to generate
             freedom (float): freedom value for LLM
             language (str): language for output
@@ -94,9 +94,10 @@ class Monju:
             self.status = PROGRESS_FAILED
             raise Exception(e) from e
 
-    def generate_ideas(self):
+    def generate_ideas(self, **kwargs):
         '''
-        Brainstorming step 1: Generate ideas
+        Brainstorming Step 1: generate ideas
+          kwargs: custom LLM setting in LLMMaster manner
         '''
         self.status = PROGRESS_IDEA_GENERATION
 
@@ -106,37 +107,21 @@ class Monju:
         try:
             master = LLMMaster()
             master.set_api_keys(self.api_keys)
-
-            prompt = IDEA_GENERATION_PROMPT.format(
-                theme=self.record[KEY_INPUT][KEY_THEME],
-                ideas=str(self.record[KEY_INPUT][KEY_IDEAS]),
-                language=self.record[KEY_INPUT][KEY_LANGUAGE])
-
-            entries = LLM_IDEA_GENERATION.copy()
-            for _, parameters in entries.items():
-                parameters['prompt'] = prompt
-                parameters['temperature'] = self.record[KEY_INPUT][KEY_FREEDOM]
-
-            if self.verbose:
-                print(f'Prompt:\n{prompt}')
-
-            master.summon(entries)
+            master.summon(self._llm_ideation(**kwargs))
             master.run()
 
             self.record[KEY_OUTPUT][KEY_IDEAS] = master.results
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time)
 
-            self.record[KEY_INPUT][PROGRESS_IDEA_GENERATION] = \
-                LLM_IDEA_GENERATION
-
         except Exception as e:
             self.status = PROGRESS_FAILED
             raise Exception(e) from e
 
-    def organize_ideas(self):
+    def organize_ideas(self, **kwargs):
         '''
-        Brainstorming step 2: Organize ideas into mindmap and class diagram
+        Brainstorming Step 2: organize ideas into mindmap and class diagram
+          kwargs: custom LLM setting in LLMMaster manner
         '''
         self.status = PROGRESS_ORGANIZING
 
@@ -146,8 +131,8 @@ class Monju:
         try:
             master = LLMMaster()
             master.set_api_keys(self.api_keys)
-            master.summon(self._mindmap_config())
-            master.summon(self._class_diagram_config())
+            master.summon(self._llm_mindmap(**kwargs))
+            master.summon(self._llm_class_diagram(**kwargs))
             master.run()
 
             self.record[KEY_OUTPUT][KEY_MINDMAP] = \
@@ -157,16 +142,14 @@ class Monju:
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time)
 
-            self.record[KEY_INPUT][KEY_MINDMAP] = LLM_MINDMAP
-            self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = LLM_CLASS_DIAGRAM
-
         except Exception as e:
             self.status = PROGRESS_FAILED
             raise Exception(e) from e
 
-    def evaluate_ideas(self):
+    def evaluate_ideas(self, **kwargs):
         '''
-        Brainstorming step 3: Evaluate ideas
+        Brainstorming Step 3: evaluate ideas
+          kwargs: custom LLM setting in LLMMaster manner
         '''
         self.status = PROGRESS_IDEA_EVALUATION
 
@@ -176,29 +159,12 @@ class Monju:
         try:
             master = LLMMaster()
             master.set_api_keys(self.api_keys)
-
-            prompt = EVALUATION_PROMPT.format(
-                theme=self.record[KEY_INPUT][KEY_THEME],
-                mermaid_class=self.record[KEY_OUTPUT][KEY_CLASS_DIAGRAM],
-                language=self.record[KEY_INPUT][KEY_LANGUAGE])
-
-            entries = LLM_IDEA_EVALUATION.copy()
-            for _, parameters in entries.items():
-                parameters['prompt'] = prompt
-                parameters['temperature'] = DEFAULT_TEMPERATURE_EVALUATION
-
-            if self.verbose:
-                print(f'Prompt:\n{prompt}')
-
-            master.summon(entries)
+            master.summon(self._llm_evaluation(**kwargs))
             master.run()
 
             self.record[KEY_OUTPUT][KEY_EVALUATION] = master.results
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time)
-
-            self.record[KEY_INPUT][PROGRESS_IDEA_EVALUATION] = \
-                LLM_IDEA_EVALUATION
 
         except Exception as e:
             self.status = PROGRESS_FAILED
@@ -213,7 +179,7 @@ class Monju:
         msg = ''
 
         if self.verbose:
-            print('Monju Step 4: Verifying...')
+            print('Monju Step 4: Verifying results...')
             print(f'Record:\n{json.dumps(self.record, indent=2)}')
 
         if not self.record[KEY_OUTPUT][KEY_IDEAS]:
@@ -227,51 +193,104 @@ class Monju:
 
         if msg:
             self.status = PROGRESS_FAILED
-            raise Exception(msg)
+            raise Exception("Error in verification: "+msg)
 
         self.status = PROGRESS_DONE
 
-    def _mindmap_config(self):
+    def _llm_ideation(self, **kwargs):
+        '''
+        LLM configuration for idea generation.
+        '''
+        entries = kwargs.copy() if kwargs else LLM_IDEA_GENERATION.copy()
+
+        self.record[KEY_INPUT][PROGRESS_IDEA_GENERATION] = entries
+
+        prompt = IDEA_GENERATION_PROMPT.format(
+            theme=self.record[KEY_INPUT][KEY_THEME],
+            ideas=str(self.record[KEY_INPUT][KEY_IDEAS]),
+            language=self.record[KEY_INPUT][KEY_LANGUAGE])
+
+        if self.verbose:
+            print(f'Prompt:\n{prompt}')
+
+        for _, parameters in entries.items():
+            parameters['prompt'] = prompt
+            parameters['temperature'] = self.record[KEY_INPUT][KEY_FREEDOM]
+
+        return entries
+
+    def _llm_mindmap(self, **kwargs):
+        '''
+        LLM configuration for mindmap generation.
+        '''
+        entries = kwargs.copy() if kwargs else LLM_MINDMAP.copy()
+        key = list(entries.keys())[0]
+        entries = {KEY_MINDMAP: entries[key]}
+
+        self.record[KEY_INPUT][KEY_MINDMAP] = entries
 
         idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
 
-        config = {
-            KEY_MINDMAP: {
-                'provider': LLM_MINDMAP['provider'],
-                'model': LLM_MINDMAP['model'],
-                'prompt': MINDMAP_GENERATION_PROMPT.format(
-                    theme=self.record[KEY_INPUT][KEY_THEME],
-                    idea_list=idea_list,
-                    language=self.record[KEY_INPUT][KEY_LANGUAGE]),
-                'temperature': DEFAULT_TEMPERATURE_MINDMAP
-            }
-        }
+        prompt = MINDMAP_GENERATION_PROMPT.format(
+            theme=self.record[KEY_INPUT][KEY_THEME],
+            idea_list=idea_list,
+            language=self.record[KEY_INPUT][KEY_LANGUAGE])
 
         if self.verbose:
-            print(f'Prompt:\n{config[KEY_MINDMAP]["prompt"]}')
+            print(f'Prompt:\n{prompt}')
 
-        return config
+        for _, parameters in entries.items():
+            parameters['prompt'] = prompt
+            parameters['temperature'] = DEFAULT_TEMPERATURE_MINDMAP
 
-    def _class_diagram_config(self):
+        return entries
+
+    def _llm_class_diagram(self, **kwargs):
+        '''
+        LLM configuration for class diagram generation.
+        '''
+        entries = kwargs.copy() if kwargs else LLM_CLASS_DIAGRAM.copy()
+        key = list(entries.keys())[0]
+        entries = {KEY_CLASS_DIAGRAM: entries[key]}
+
+        self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = entries
 
         idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
 
-        config = {
-            KEY_CLASS_DIAGRAM: {
-                'provider': LLM_CLASS_DIAGRAM['provider'],
-                'model': LLM_CLASS_DIAGRAM['model'],
-                'prompt': CLASS_DIAGRAM_GENERATION_PROMPT.format(
-                    theme=self.record[KEY_INPUT][KEY_THEME],
-                    idea_list=idea_list,
-                    language=self.record[KEY_INPUT][KEY_LANGUAGE]),
-                'temperature': DEFAULT_TEMPERATURE_CLASS_DIAGRAM
-            }
-        }
+        prompt = CLASS_DIAGRAM_GENERATION_PROMPT.format(
+            theme=self.record[KEY_INPUT][KEY_THEME],
+            idea_list=idea_list,
+            language=self.record[KEY_INPUT][KEY_LANGUAGE])
 
         if self.verbose:
-            print(f'Prompt:\n{config[KEY_CLASS_DIAGRAM]["prompt"]}')
+            print(f'Prompt:\n{prompt}')
 
-        return config
+        for _, parameters in entries.items():
+            parameters['prompt'] = prompt
+            parameters['temperature'] = DEFAULT_TEMPERATURE_CLASS_DIAGRAM
+
+        return entries
+
+    def _llm_evaluation(self, **kwargs):
+        '''
+        LLM configuration for idea evaluation.
+        '''
+        entries = kwargs.copy() if kwargs else LLM_IDEA_EVALUATION.copy()
+        self.record[KEY_INPUT][PROGRESS_IDEA_EVALUATION] = entries
+
+        prompt = EVALUATION_PROMPT.format(
+            theme=self.record[KEY_INPUT][KEY_THEME],
+            mermaid_class=self.record[KEY_OUTPUT][KEY_CLASS_DIAGRAM],
+            language=self.record[KEY_INPUT][KEY_LANGUAGE])
+
+        if self.verbose:
+            print(f'Prompt:\n{prompt}')
+
+        for _, parameters in entries.items():
+            parameters['prompt'] = prompt
+            parameters['temperature'] = DEFAULT_TEMPERATURE_EVALUATION
+
+        return entries
 
     def _sanitize_mermaid(self, source: str):
         '''

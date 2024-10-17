@@ -27,6 +27,8 @@ IDEAS = 5
 FREEDOM = 0.2
 LANGUAGE = 'EN'
 
+OUTPUT_DIR = Path('test-output')
+
 
 @pytest.fixture
 def run_api(request):
@@ -68,7 +70,7 @@ def test_monju_missing_language():
 def test_monju_no_parameters():
     with pytest.raises(ValueError,
                        match='No parameters are given.'):
-        Monju(api_keys=API_KEY)
+        Monju()
 
 
 def test_monju_no_theme():
@@ -94,9 +96,10 @@ def test_monju_batch(run_api):
     except Exception as e:
         pytest.fail(f'Error: {e}')
 
-    print(f'Result:\n{json.dumps(bs.record, indent=2)}')
+    print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
 
-    with open('monju_batch.json', 'w', encoding='utf-8') as f:
+    save_as = OUTPUT_DIR / 'monju_batch.json'
+    with open(save_as, 'w', encoding='utf-8') as f:
         json.dump(bs.record, f, indent=2, ensure_ascii=False)
 
     assert judgment is True
@@ -107,28 +110,66 @@ def test_monju_step_by_step(run_api):
     judgment = True
 
     params = pack_parameters(theme=THEME,
-                             ideas=IDEAS,
-                             freedom=FREEDOM,
-                             language=LANGUAGE)
+                             ideas=3,
+                             freedom=0.8,
+                             language='ja')
     bs = Monju(api_keys=API_KEY, verbose=True, **params)
 
     try:
         if run_api:
+
             print(f"Status: {bs.status}")
-            bs.generate_ideas()
+            bs.generate_ideas(**{
+                'openai_ideation': {
+                    'provider': 'openai',
+                    'model': 'gpt-4o-mini'
+                },
+                'anthropic_ideation': {
+                    'provider': 'anthropic',
+                    'model': 'claude-3-haiku-20240307'
+                },
+                'google_ideation': {
+                    'provider': 'google',
+                    'model': 'gemini-1.5-flash'
+                }
+            })
+
             print(f"Status: {bs.status}")
-            bs.organize_ideas()
+            bs.organize_ideas(**{
+                'claude_organization': {
+                    'provider': 'anthropic',
+                    'model': 'claude-3-5-sonnet-20240620'
+                }
+            })
+
             print(f"Status: {bs.status}")
-            bs.evaluate_ideas()
+            bs.evaluate_ideas(**{
+                'openai_evaluation': {
+                    'provider': 'openai',
+                    'model': 'gpt-4o-mini'
+                },
+                'anthropic_evaluation': {
+                    'provider': 'anthropic',
+                    'model': 'claude-3-haiku-20240307'
+                },
+                'google_evaluation': {
+                    'provider': 'google',
+                    'model': 'gemini-1.5-flash'
+                }
+            })
+
             print(f"Status: {bs.status}")
             bs.verify()
+
             print(f"Status: {bs.status}")
+
     except Exception as e:
         pytest.fail(f'Error: {e}')
 
-    print(f'Result:\n{json.dumps(bs.record, indent=2)}')
+    print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
 
-    with open('monju_sbs.json', 'w', encoding='utf-8') as f:
+    save_as = OUTPUT_DIR / 'monju_sbs.json'
+    with open(save_as, 'w', encoding='utf-8') as f:
         json.dump(bs.record, f, indent=2, ensure_ascii=False)
 
     assert judgment is True

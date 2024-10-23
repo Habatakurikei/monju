@@ -67,8 +67,8 @@ Here's a basic example of how to use monju:
 
 ```python
 import json
-
 from pathlib import Path
+
 from monju import Monju
 
 API_KEY = Path('your_api_keys.txt').read_text(encoding='utf-8')
@@ -83,7 +83,7 @@ params = pack_parameters(
     theme="How to survive in the era of emerging AI?",
     ideas=5,
     freedom=0.2,
-    language="EN"
+    language="en"
 )
 bs = Monju(api_keys=API_KEY, verbose=True, **params)
 
@@ -102,8 +102,8 @@ The following example works equivalently to the batch execution example above.
 
 ```python
 import json
-
 from pathlib import Path
+
 from monju import Monju
 
 API_KEY = Path('your_api_keys.txt').read_text(encoding='utf-8')
@@ -118,8 +118,9 @@ params = pack_parameters(
     theme="How to survive in the era of emerging AI?",
     ideas=5,
     freedom=0.2,
-    language="EN"
+    language="en"
 )
+
 bs = Monju(api_keys=API_KEY, verbose=True, **params)
 
 # Start the brainstorming process
@@ -150,7 +151,7 @@ There are several parameters to set for `Monju` class:
   - `theme` (str) **required**: theme or topic of brainstorming, a.k.a. prompt
   - `ideas` (int): number of ideas to generate by each LLM
   - `freedom` (float): value of freedom-looking thinking for each LLM, a.k.a. temperature, between 0 and 1
-  - `language` (str): language for output, default is `EN` and must be followed by two-letter code defined in [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+  - `language` (str): language for output, default is `en` and must be followed by two-letter code defined in [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 
 As shown in the examples above, the brainstorming parameters are passed to `Monju` class as a dictionary. Use `pack_parameters` to format.
 
@@ -164,7 +165,7 @@ Results are given in JSON format. Here is a real example of `print(bs.record)` g
     "theme": "How to survive in the era of emerging AI?",
     "ideas": 5,
     "freedom": 0.2,
-    "language": "EN",
+    "language": "en",
     "idea_generation": {
       "openai": {
         "provider": "openai",

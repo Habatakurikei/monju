@@ -2,7 +2,7 @@
 
 DEFAULT_FREEDOM = 0.7
 DEFAULT_IDEAS = 10
-DEFAULT_LANGUAGE = 'EN'
+DEFAULT_LANGUAGE = 'en'
 DEFAULT_TEMPERATURE_CLASS_DIAGRAM = 0.0
 DEFAULT_TEMPERATURE_EVALUATION = 0.7
 DEFAULT_TEMPERATURE_MINDMAP = 0.0
@@ -25,8 +25,8 @@ PROGRESS_ORGANIZING = 'organizing'
 PROGRESS_VERIFYING = 'verifying'
 
 # Candidate LLM Models
-# - openai: gpt-4o-mini, gpt-4o-2024-08-06
-# - anthropic: claude-3-haiku-20240307, claude-3-5-sonnet-20240620
+# - openai: gpt-4o-mini, gpt-4o
+# - anthropic: claude-3-haiku-20240307, claude-3-5-sonnet-20241022
 # - google: gemini-1.5-flash, gemini-1.5-flash-exp-0827
 
 KEY_ANTHROPIC = 'anthropic'
@@ -114,7 +114,7 @@ Idea List:
 Format:
 ```mermaid
 mindmap
-    root [Write the theme here]
+    {theme}
         (Summary of ideas)
             (Idea item)
 ```
@@ -129,7 +129,7 @@ Conditions:
 1. Group similar items in the "Idea List" into several groups and make them classes.
 2. Output the result in "Format" as Mermaid chart. Do not include your explanations.
 3. The language of the output is in {language} of ISO 639-1 format.
-4. Find the relationships between each class and reflect them in the class diagram.
+4. Use `-->` to indicate the relationship between classes.
 
 Idea List:
 {idea_list}

@@ -110,6 +110,8 @@ class Monju:
             master.summon(self._llm_ideation(**kwargs))
             master.run()
 
+            for key, value in master.results.items():
+                master.results[key] = self._remove_highlight(value)
             self.record[KEY_OUTPUT][KEY_IDEAS] = master.results
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time)
@@ -162,6 +164,8 @@ class Monju:
             master.summon(self._llm_evaluation(**kwargs))
             master.run()
 
+            for key, value in master.results.items():
+                master.results[key] = self._remove_highlight(value)
             self.record[KEY_OUTPUT][KEY_EVALUATION] = master.results
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time)
@@ -180,7 +184,8 @@ class Monju:
 
         if self.verbose:
             print('Monju Step 4: Verifying results...')
-            print(f'Record:\n{json.dumps(self.record, indent=2)}')
+            print(f'Record:\n'
+                  f'{json.dumps(self.record, indent=2, ensure_ascii=False)}')
 
         if not self.record[KEY_OUTPUT][KEY_IDEAS]:
             msg += 'Ideas are not generated. '
@@ -305,3 +310,9 @@ class Monju:
         text = text.replace('(', '-')
         text = text.replace(')', '-')
         return text
+
+    def _remove_highlight(self, source: str):
+        '''
+        Remove highlight syntax in evaluation text.
+        '''
+        return source.replace('**', '').replace('#', '')

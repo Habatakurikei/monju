@@ -25,7 +25,7 @@ API_KEY = ''
 THEME = 'How to survive in the era of emerging AI?'
 IDEAS = 5
 FREEDOM = 0.2
-LANGUAGE = 'EN'
+LANGUAGE = 'en'
 
 OUTPUT_DIR = Path('test-output')
 
@@ -138,7 +138,7 @@ def test_monju_step_by_step(run_api):
             bs.organize_ideas(**{
                 'claude_organization': {
                     'provider': 'anthropic',
-                    'model': 'claude-3-5-sonnet-20240620'
+                    'model': 'claude-3-5-sonnet-20241022'
                 }
             })
 

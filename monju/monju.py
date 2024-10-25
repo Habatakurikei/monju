@@ -285,7 +285,7 @@ class Monju:
 
         prompt = EVALUATION_PROMPT.format(
             theme=self.record[KEY_INPUT][KEY_THEME],
-            mermaid_class=self.record[KEY_OUTPUT][KEY_CLASS_DIAGRAM],
+            mermaid_mindmap=self.record[KEY_OUTPUT][KEY_MINDMAP],
             language=self.record[KEY_INPUT][KEY_LANGUAGE])
 
         if self.verbose:

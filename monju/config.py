@@ -126,10 +126,10 @@ Purpose: Organize the "Idea List" into a class diagram based on the "Theme" and 
 Theme: {theme}
 
 Conditions:
-1. Group similar items in the "Idea List" into several groups and make them classes.
-2. Output the result in "Format" as Mermaid chart. Do not include your explanations.
-3. The language of the output is in {language} of ISO 639-1 format.
-4. Use `-->` to indicate the relationship between classes.
+1. Output the result in "Format" as Mermaid chart. Do not include your explanations.
+2. Make 3 to 7 groups by finding similar items in the "Idea List",  and define `class` for output.
+3. Look for classes that seem related and draw line between them using `-->` for output.
+4. The language of the output is in {language} of ISO 639-1 format.
 
 Idea List:
 {idea_list}
@@ -137,6 +137,7 @@ Idea List:
 Format:
 ```mermaid
 classDiagram
+    class
 ```
 '''
 
@@ -147,13 +148,12 @@ Theme: {theme}
 
 Conditions:
 1. Write "Overall Evaluation", "Good Points", and "Areas for Improvement" according to the "Format".
-2. The language of the output is in {language} of ISO 639-1 format.
-3. Write as concisely and focused on key points as possible.
-4. The mindmap is provided as a class diagram.
-5. Do not add any unnecessary decorations to the bullet points.
+2. Write as concisely and focused on key points as possible.
+3. The language of the output is in {language} of ISO 639-1 format.
+4. Do not add any unnecessary decorations to the bullet points.
 
 Mindmap:
-{mermaid_class}
+{mermaid_mindmap}
 
 Format:
 - Overall Evaluation:

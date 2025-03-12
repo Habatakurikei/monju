@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="monju",
-    version="0.1.4",
+    version="0.2.0",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A python library for brainstorming by multiple LLMs.",
@@ -13,10 +13,10 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://pypi.org/project/monju/",
     project_urls={
-        'Homepage': 'https://habatakurikei.com/',
-        'GitHub': 'https://github.com/Habatakurikei/monju',
+        "Homepage": "https://habatakurikei.com/",
+        "GitHub": "https://github.com/Habatakurikei/monju",
     },
-    packages=setuptools.find_packages(include=['monju', 'monju.*']),
+    packages=setuptools.find_packages(include=["monju", "monju.*"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -29,7 +29,7 @@ setuptools.setup(
     ],
     python_requires=">=3.10",
     install_requires=[
-        "llmmaster>=0.8.0",
+        "llmmaster>=1.0.0",
     ],
     extras_require={
         "dev": [

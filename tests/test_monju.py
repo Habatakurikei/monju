@@ -91,12 +91,7 @@ def test_monju_batch(run_api: bool, load_api_file: bool) -> None:
     """
     judgment = True
     api_keys = ''
-    params = pack_parameters(
-        theme=THEME,
-        ideas=IDEAS,
-        freedom=FREEDOM,
-        language=LANGUAGE
-    )
+    params = pack_parameters(theme=THEME)
 
     if load_api_file:
         api_keys = load_api_keys()
@@ -130,11 +125,10 @@ def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         api_keys = load_api_keys()
 
-    bs = Monju(api_keys=api_keys, verbose=False, **params)
+    bs = Monju(api_keys=api_keys, verbose=True, **params)
 
     try:
         if run_api:
-
             print(f"Status: {bs.status}")
             bs.generate_ideas(**{
                 "openai_ideation": {
@@ -194,26 +188,22 @@ def test_monju_reasoning(run_api: bool, load_api_file: bool) -> None:
     """
     Execution of monju reasoning.
     """
-    """
-    Execution of monju brainstorming in step-by-step mode.
-    """
     judgment = True
     api_keys = ''
     params = pack_parameters(
         theme=THEME,
         ideas=20,
-        freedom=0.8,
+        freedom=0.2,
         language="ja"
     )
 
     if load_api_file:
         api_keys = load_api_keys()
 
-    bs = Monju(api_keys=api_keys, verbose=False, **params)
+    bs = Monju(api_keys=api_keys, verbose=True, **params)
 
     try:
         if run_api:
-
             print(f"Status: {bs.status}")
             bs.generate_ideas()
 

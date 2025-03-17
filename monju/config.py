@@ -81,17 +81,17 @@ LLM_IDEA_EVALUATION = {
 # Prompts
 
 IDEA_GENERATION_PROMPT = '''
-Purpose: Generate {ideas} ideas on the following "Theme" and meeting the "Conditions".
+Purpose: Generate $ideas ideas on the following "Theme" and meeting the "Conditions".
 
 Conditions:
 1. Propose ideas with free thinking.
 2. Consider the 5W1H when proposing.
 3. Return the results in bullet points as shown in the "Format".
-4. The language of the output is in {language} of ISO 639-1 format.
+4. The language of the output is in $language of ISO 639-1 format.
 5. Do not include your explanations.
 6. Do not add any unnecessary decorations to the bullet points.
 
-Theme: {theme}
+Theme: $theme
 
 Format:
 - Idea
@@ -100,22 +100,20 @@ Format:
 MINDMAP_GENERATION_PROMPT = '''
 Purpose: Organize the "Idea List" into a mindmap based on the "Theme" and meeting the "Conditions".
 
-Theme: {theme}
+Theme: $theme
 
 Conditions:
-1. Group similar items in the "Idea List" into several groups and create a hierarchical structure.
-2. Output the result in "Format" as Mermaid chart. Do not include your explanations.
-3. The language of the output is in {language} of ISO 639-1 format.
-4. Write the "Theme" as the root.
-5. Enclose each idea item in parentheses () with an appropriate indent.
+1. Output the result in "Format" as Mermaid chart. Do not include your explanations.
+2. Group similar items in the "Idea List" into several groups and create a hierarchical structure.
+3. The language of the output is in $language of ISO 639-1 format.
 
 Idea List:
-{idea_list}
+$idea_list
 
 Format:
 ```mermaid
 mindmap
-    {theme}
+    $theme
         (Summary of ideas)
             (Idea item)
 ```
@@ -124,37 +122,43 @@ mindmap
 CLASS_DIAGRAM_GENERATION_PROMPT = '''
 Purpose: Organize the "Idea List" into a class diagram based on the "Theme" and meeting the "Conditions".
 
-Theme: {theme}
+Theme: $theme
 
 Conditions:
 1. Output the result in "Format" as Mermaid chart. Do not include your explanations.
 2. Make 3 to 7 groups by finding similar items in the "Idea List",  and define `class` for output.
 3. Look for classes that seem related and draw line between them using `-->` for output.
-4. The language of the output is in {language} of ISO 639-1 format.
+4. The language of the output is in $language of ISO 639-1 format.
 
 Idea List:
-{idea_list}
+$idea_list
 
 Format:
 ```mermaid
 classDiagram
-    class
+    class ClassA {
+        idea
+    }
+    class ClassB {
+        idea
+    }
+    ClassA --> ClassB
 ```
 '''
 
 EVALUATION_PROMPT = '''
 Purpose: Evaluate the "Mindmap" based on the "Theme" and meeting the "Conditions".
 
-Theme: {theme}
+Theme: $theme
 
 Conditions:
 1. Write "Overall Evaluation", "Good Points", and "Areas for Improvement" according to the "Format".
 2. Write as concisely and focused on key points as possible.
-3. The language of the output is in {language} of ISO 639-1 format.
+3. The language of the output is in $language of ISO 639-1 format.
 4. Do not add any unnecessary decorations to the bullet points.
 
 Mindmap:
-{mermaid_mindmap}
+$mermaid_mindmap
 
 Format:
 - Overall Evaluation:

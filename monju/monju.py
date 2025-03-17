@@ -1,3 +1,5 @@
+from string import Template
+
 from llmmaster import LLMMaster
 from llmmaster.utils import extract_llm_response
 
@@ -222,7 +224,7 @@ class Monju:
 
         self.record[KEY_INPUT][PROGRESS_IDEA_GENERATION] = entries
 
-        prompt = IDEA_GENERATION_PROMPT.format(
+        prompt = Template(IDEA_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
             ideas=str(self.record[KEY_INPUT][KEY_IDEAS]),
             language=self.record[KEY_INPUT][KEY_LANGUAGE]
@@ -247,7 +249,7 @@ class Monju:
         self.record[KEY_INPUT][KEY_MINDMAP] = llm_config
 
         idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
-        prompt = MINDMAP_GENERATION_PROMPT.format(
+        prompt = Template(MINDMAP_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
             idea_list=idea_list,
             language=self.record[KEY_INPUT][KEY_LANGUAGE]
@@ -272,7 +274,7 @@ class Monju:
         self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = llm_config
 
         idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
-        prompt = CLASS_DIAGRAM_GENERATION_PROMPT.format(
+        prompt = Template(CLASS_DIAGRAM_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
             idea_list=idea_list,
             language=self.record[KEY_INPUT][KEY_LANGUAGE]
@@ -293,7 +295,7 @@ class Monju:
         entries = kwargs.copy() if kwargs else LLM_IDEA_EVALUATION.copy()
         self.record[KEY_INPUT][PROGRESS_IDEA_EVALUATION] = entries
 
-        prompt = EVALUATION_PROMPT.format(
+        prompt = Template(EVALUATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
             mermaid_mindmap=self.record[KEY_OUTPUT][KEY_MINDMAP],
             language=self.record[KEY_INPUT][KEY_LANGUAGE]

@@ -3,4 +3,4 @@ wheel
 twine
 flake8
 pytest
-llmmaster
+llmmaster==1.0.0

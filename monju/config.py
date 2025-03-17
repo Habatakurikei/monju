@@ -2,79 +2,80 @@
 
 DEFAULT_FREEDOM = 0.7
 DEFAULT_IDEAS = 10
-DEFAULT_LANGUAGE = 'en'
+DEFAULT_LANGUAGE = "en"
 DEFAULT_TEMPERATURE_CLASS_DIAGRAM = 0.0
 DEFAULT_TEMPERATURE_EVALUATION = 0.7
 DEFAULT_TEMPERATURE_MINDMAP = 0.0
-KEY_CLASS_DIAGRAM = 'class_diagram'
-KEY_ELAPSED_TIME = 'elapsed_time'
-KEY_EVALUATION = 'evaluation'
-KEY_FREEDOM = 'freedom'
-KEY_IDEAS = 'ideas'
-KEY_INPUT = 'input'
-KEY_LANGUAGE = 'language'
-KEY_MINDMAP = 'mindmap'
-KEY_OUTPUT = 'output'
-KEY_THEME = 'theme'
-PROGRESS_DONE = 'done'
-PROGRESS_FAILED = 'failed'
-PROGRESS_IDEA_EVALUATION = 'idea_evaluation'
-PROGRESS_IDEA_GENERATION = 'idea_generation'
-PROGRESS_NOT_STARTED = 'not_started'
-PROGRESS_ORGANIZING = 'organizing'
-PROGRESS_VERIFYING = 'verifying'
+DEFAULT_TEMPERATURE_IDEA_GENERATION = 0.0
+KEY_CLASS_DIAGRAM = "class_diagram"
+KEY_ELAPSED_TIME = "elapsed_time"
+KEY_EVALUATION = "evaluation"
+KEY_FREEDOM = "freedom"
+KEY_IDEAS = "ideas"
+KEY_INPUT = "input"
+KEY_LANGUAGE = "language"
+KEY_MINDMAP = "mindmap"
+KEY_OUTPUT = "output"
+KEY_THEME = "theme"
+PROGRESS_DONE = "done"
+PROGRESS_FAILED = "failed"
+PROGRESS_IDEA_EVALUATION = "idea_evaluation"
+PROGRESS_IDEA_GENERATION = "idea_generation"
+PROGRESS_NOT_STARTED = "not_started"
+PROGRESS_ORGANIZING = "organizing"
+PROGRESS_VERIFYING = "verifying"
 
 # Candidate LLM Models
 # - openai: gpt-4o-mini, gpt-4o
 # - anthropic: claude-3-haiku-20240307, claude-3-5-sonnet-20241022
 # - google: gemini-1.5-flash, gemini-1.5-flash-exp-0827
 
-KEY_ANTHROPIC = 'anthropic'
-KEY_GOOGLE = 'google'
-KEY_OPENAI = 'openai'
+KEY_ANTHROPIC = "anthropic"
+KEY_GOOGLE = "google"
+KEY_OPENAI = "openai"
 
 LLM_IDEA_GENERATION = {
     KEY_OPENAI: {
-        'provider': KEY_OPENAI,
-        'model': 'gpt-4o-mini'
+        "provider": KEY_OPENAI,
+        "model": "gpt-4o-mini",
     },
     KEY_ANTHROPIC: {
-        'provider': KEY_ANTHROPIC,
-        'model': 'claude-3-haiku-20240307'
+        "provider": KEY_ANTHROPIC,
+        "model": "claude-3-haiku-20240307",
     },
     KEY_GOOGLE: {
-        'provider': KEY_GOOGLE,
-        'model': 'gemini-1.5-flash'
-    }
+        "provider": KEY_GOOGLE,
+        "model": "gemini-1.5-flash",
+    },
 }
 
 LLM_MINDMAP = {
     KEY_MINDMAP: {
-        'provider': KEY_OPENAI,
-        'model': 'gpt-4o'
-    }
+        "provider": KEY_OPENAI,
+        "model": "gpt-4o",
+    },
 }
 
 LLM_CLASS_DIAGRAM = {
     KEY_CLASS_DIAGRAM: {
-        'provider': KEY_OPENAI,
-        'model': 'gpt-4o'
-    }
+        "provider": KEY_OPENAI,
+        "model": "gpt-4o",
+    },
 }
 
 LLM_IDEA_EVALUATION = {
     KEY_OPENAI: {
-        'provider': KEY_OPENAI,
-        'model': 'gpt-4o-mini'
+        "provider": KEY_OPENAI,
+        "model": "gpt-4o-mini",
     },
     KEY_ANTHROPIC: {
-        'provider': KEY_ANTHROPIC,
-        'model': 'claude-3-haiku-20240307'
+        "provider": KEY_ANTHROPIC,
+        "model": "claude-3-haiku-20240307",
     },
     KEY_GOOGLE: {
-        'provider': KEY_GOOGLE,
-        'model': 'gemini-1.5-flash'
-    }
+        "provider": KEY_GOOGLE,
+        "model": "gemini-1.5-flash",
+    },
 }
 
 # Prompts

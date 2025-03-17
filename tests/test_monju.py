@@ -1,160 +1,179 @@
-import json
-import os
-import sys
-from pathlib import Path
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../monju'))
-
 import pytest
 
+from conftest import load_api_keys
+from conftest import pack_parameters
+from conftest import save_as
 from monju.config import DEFAULT_FREEDOM
 from monju.config import DEFAULT_IDEAS
 from monju.config import DEFAULT_LANGUAGE
+from monju.config import KEY_CLASS_DIAGRAM
 from monju.config import KEY_FREEDOM
 from monju.config import KEY_IDEAS
 from monju.config import KEY_INPUT
 from monju.config import KEY_LANGUAGE
+from monju.config import KEY_MINDMAP
 from monju.config import KEY_THEME
-from monju import Monju
+from monju.monju import Monju
 
 
-# API_KEY = Path('api_key_pairs.txt').read_text(encoding='utf-8')
-API_KEY = ''
-
-THEME = 'How to survive in the era of emerging AI?'
+THEME = "How to survive in the era of emerging AI?"
 IDEAS = 5
 FREEDOM = 0.2
-LANGUAGE = 'en'
-
-OUTPUT_DIR = Path('test-output')
+LANGUAGE = "en"
 
 
 @pytest.fixture
-def run_api(request):
+def run_api(request) -> bool:
     return request.config.getoption("--run-api")
 
 
-def pack_parameters(**kwargs):
-    '''
-    Use this function to arrange entry parameters in dictionary format.
-    '''
-    return kwargs
+@pytest.fixture
+def load_api_file(request) -> bool:
+    return request.config.getoption("--load-api-file")
 
 
-def test_monju_missing_theme():
+def test_monju_missing_theme() -> None:
     params = pack_parameters(ideas=IDEAS, freedom=FREEDOM, language=LANGUAGE)
-    with pytest.raises(ValueError,
-                       match=f'{KEY_THEME} is not given or not str.'):
-        Monju(api_keys=API_KEY, **params)
+    with pytest.raises(
+        ValueError,
+        match=f"{KEY_THEME} is not given or not str."
+    ):
+        Monju(**params)
 
 
-def test_monju_missing_ideas():
+def test_monju_missing_ideas() -> None:
     params = pack_parameters(theme=THEME, freedom=FREEDOM, language=LANGUAGE)
-    monju = Monju(api_keys=API_KEY, **params)
+    monju = Monju(**params)
     assert monju.record[KEY_INPUT][KEY_IDEAS] == DEFAULT_IDEAS
 
 
-def test_monju_missing_freedom():
+def test_monju_missing_freedom() -> None:
     params = pack_parameters(theme=THEME, ideas=IDEAS, language=LANGUAGE)
-    monju = Monju(api_keys=API_KEY, **params)
+    monju = Monju(**params)
     assert monju.record[KEY_INPUT][KEY_FREEDOM] == DEFAULT_FREEDOM
 
 
-def test_monju_missing_language():
+def test_monju_missing_language() -> None:
     params = pack_parameters(theme=THEME, ideas=IDEAS, freedom=FREEDOM)
-    monju = Monju(api_keys=API_KEY, **params)
+    monju = Monju(**params)
     assert monju.record[KEY_INPUT][KEY_LANGUAGE] == DEFAULT_LANGUAGE
 
 
-def test_monju_no_parameters():
-    with pytest.raises(ValueError,
-                       match='No parameters are given.'):
+def test_monju_no_parameters() -> None:
+    with pytest.raises(
+        ValueError,
+        match="No parameters are given."
+    ):
         Monju()
 
 
-def test_monju_no_theme():
+def test_monju_no_theme() -> None:
     params = pack_parameters(theme='')
-    with pytest.raises(ValueError,
-                       match=f'{KEY_THEME} is not given or not str.'):
-        Monju(api_keys=API_KEY, **params)
+    with pytest.raises(
+        ValueError,
+        match=f"{KEY_THEME} is not given or not str."
+    ):
+        Monju(**params)
 
 
-def test_monju_batch(run_api):
+def test_monju_wrong_theme() -> None:
+    params = pack_parameters(theme=1)
+    with pytest.raises(
+        ValueError,
+        match=f"{KEY_THEME} is not given or not str."
+    ):
+        Monju(**params)
 
+
+def test_monju_batch(run_api: bool, load_api_file: bool) -> None:
+    """
+    Execution of monju brainstorming in batch mode.
+    """
     judgment = True
+    api_keys = ''
+    params = pack_parameters(
+        theme=THEME,
+        ideas=IDEAS,
+        freedom=FREEDOM,
+        language=LANGUAGE
+    )
 
-    params = pack_parameters(theme=THEME,
-                             ideas=IDEAS,
-                             freedom=FREEDOM,
-                             language=LANGUAGE)
-    bs = Monju(api_keys=API_KEY, verbose=True, **params)
+    if load_api_file:
+        api_keys = load_api_keys()
+
+    bs = Monju(api_keys=api_keys, **params)
 
     try:
         if run_api:
             bs.brainstorm()
     except Exception as e:
-        pytest.fail(f'Error: {e}')
+        pytest.fail(f"Error: {e}")
 
-    print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
-
-    save_as = OUTPUT_DIR / 'monju_batch.json'
-    with open(save_as, 'w', encoding='utf-8') as f:
-        json.dump(bs.record, f, indent=2, ensure_ascii=False)
+    save_as("monju_batch.json", bs.record)
 
     assert judgment is True
 
 
-def test_monju_step_by_step(run_api):
-
+def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
+    """
+    Execution of monju brainstorming in step-by-step mode.
+    """
     judgment = True
+    api_keys = ''
+    params = pack_parameters(
+        theme=THEME,
+        ideas=20,
+        freedom=0.8,
+        language="ja"
+    )
 
-    params = pack_parameters(theme=THEME,
-                             ideas=3,
-                             freedom=0.8,
-                             language='ja')
-    bs = Monju(api_keys=API_KEY, verbose=True, **params)
+    if load_api_file:
+        api_keys = load_api_keys()
+
+    bs = Monju(api_keys=api_keys, verbose=False, **params)
 
     try:
         if run_api:
 
             print(f"Status: {bs.status}")
             bs.generate_ideas(**{
-                'openai_ideation': {
-                    'provider': 'openai',
-                    'model': 'gpt-4o-mini'
+                "openai_ideation": {
+                    "provider": "openai",
+                    "model": "o3-mini"
                 },
-                'anthropic_ideation': {
-                    'provider': 'anthropic',
-                    'model': 'claude-3-haiku-20240307'
+                "anthropic_ideation": {
+                    "provider": "anthropic",
+                    "model": "claude-3-7-sonnet-latest"
                 },
-                'google_ideation': {
-                    'provider': 'google',
-                    'model': 'gemini-1.5-flash'
+                "google_ideation": {
+                    "provider": "google",
+                    "model": "gemini-2.0-flash"
                 }
             })
 
             print(f"Status: {bs.status}")
             bs.organize_ideas(**{
-                'claude_organization': {
-                    'provider': 'anthropic',
-                    'model': 'claude-3-5-sonnet-20241022'
+                KEY_MINDMAP: {
+                    "provider": "deepseek"
+                },
+                KEY_CLASS_DIAGRAM: {
+                    "provider": "deepseek"
                 }
             })
 
             print(f"Status: {bs.status}")
             bs.evaluate_ideas(**{
-                'openai_evaluation': {
-                    'provider': 'openai',
-                    'model': 'gpt-4o-mini'
+                "openai_evaluation": {
+                    "provider": "openai",
+                    "model": "gpt-4o-mini"
                 },
-                'anthropic_evaluation': {
-                    'provider': 'anthropic',
-                    'model': 'claude-3-haiku-20240307'
+                "anthropic_evaluation": {
+                    "provider": "anthropic",
+                    "model": "claude-3-haiku-20240307"
                 },
-                'google_evaluation': {
-                    'provider': 'google',
-                    'model': 'gemini-1.5-flash'
+                "google_evaluation": {
+                    "provider": "google",
+                    "model": "gemini-1.5-flash"
                 }
             })
 
@@ -164,12 +183,73 @@ def test_monju_step_by_step(run_api):
             print(f"Status: {bs.status}")
 
     except Exception as e:
-        pytest.fail(f'Error: {e}')
+        pytest.fail(f"Error: {e}")
 
-    print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
+    save_as("monju_sbs.json", bs.record)
 
-    save_as = OUTPUT_DIR / 'monju_sbs.json'
-    with open(save_as, 'w', encoding='utf-8') as f:
-        json.dump(bs.record, f, indent=2, ensure_ascii=False)
+    assert judgment is True
+
+
+def test_monju_reasoning(run_api: bool, load_api_file: bool) -> None:
+    """
+    Execution of monju reasoning.
+    """
+    """
+    Execution of monju brainstorming in step-by-step mode.
+    """
+    judgment = True
+    api_keys = ''
+    params = pack_parameters(
+        theme=THEME,
+        ideas=20,
+        freedom=0.8,
+        language="ja"
+    )
+
+    if load_api_file:
+        api_keys = load_api_keys()
+
+    bs = Monju(api_keys=api_keys, verbose=False, **params)
+
+    try:
+        if run_api:
+
+            print(f"Status: {bs.status}")
+            bs.generate_ideas()
+
+            print(f"Status: {bs.status}")
+            bs.organize_ideas(**{
+                KEY_MINDMAP: {
+                    "provider": "deepseek"
+                },
+                KEY_CLASS_DIAGRAM: {
+                    "provider": "deepseek"
+                }
+            })
+
+            print(f"Status: {bs.status}")
+            bs.evaluate_ideas(**{
+                "openai": {
+                    "provider": "openai",
+                    "model": "o3-mini",
+                    "reasoning_effort": "high"
+                },
+                "anthropic": {
+                    "provider": "anthropic",
+                    "model": "claude-3-7-sonnet-20250219",
+                    "thinking": {"type": "enabled", "budget_tokens": 10000},
+                    "max_tokens": 128000
+                },
+            })
+
+            print(f"Status: {bs.status}")
+            bs.verify()
+
+            print(f"Status: {bs.status}")
+
+    except Exception as e:
+        pytest.fail(f"Error: {e}")
+
+    save_as("monju_reasoning.json", bs.record)
 
     assert judgment is True

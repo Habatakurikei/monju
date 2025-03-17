@@ -9,7 +9,7 @@ The Japanese proverb “三人寄れば文殊の知恵” (San nin yoreba monju 
 ## Features
 
 - Generate ideas based on a given theme
-- Organize ideas into mindmaps and class diagrams
+- Organize ideas into mindmaps and affinity diagrams (class diagrams)
 - Evaluate generated ideas
 - Support for multiple LLM providers (OpenAI, Anthropic, Google)
 - Customizable parameters for idea generation
@@ -22,17 +22,17 @@ For general information of monju.ai, see my article from Medium "[***monju.ai: a
 
 ## Brainstorming Process by monju
 
+For the general approach to brainstorming, see [Brainstorming - Wikipedia](https://en.wikipedia.org/wiki/Brainstorming).
+
 The brainstorming process by monju consists of three main steps:
 
 1. Generate ideas in list
-2. Organize ideas in mindmap and class diagram
-3. Evaluate ideas including overall evaluation, good points, and areas for improvement
+2. Organize ideas in mindmap and class diagram in Mermaid
+3. Evaluate ideas including overall, good points, and areas for improvement
 
 Each step is implemented as a method in the `Monju` class.
 
-For the general approach to brainstorming, see [Brainstorming - Wikipedia](https://en.wikipedia.org/wiki/Brainstorming).
-
-Both mindmap and class diagram are described in mermaid format. Output can be drawn by any mermaid-compatible tools mainly in JavaScript, e.g. [Mermaid Live Editor](https://mermaid.live/).
+Both mindmap and class diagram are described in Mermaid text format. Output can be drawn by any mermaid-compatible tools mainly in JavaScript, e.g. [Mermaid Live Editor](https://mermaid.live/).
 
 ## KJ method (Affinity Diagram)
 
@@ -42,7 +42,7 @@ The KJ method is to categorize ideas into groups based on their similarity. Each
 
 People in Japan hesitate open discussion. Writing in cards and categorizing them into groups might help open mind.
 
-In monju, draw affinity wall diagram in class diagram. This process is called "pseudo KJ method" in this library.
+In monju, affinity diagram is generated as class diagram of Mermaid. This process is called "pseudo KJ method" in this library.
 
 For details of KJ method, see [Affinity diagram - Wikipedia](https://en.wikipedia.org/wiki/Affinity_diagram).
 
@@ -61,9 +61,9 @@ This library uses `LLMMaster`, a unified interface to access major LLM providers
 
 ## Usage
 
-Here's a basic example of how to use monju:
-
 ### Batch Execution
+
+By just one call, all the steps of brainstorming can be done. Here is an typical example.
 
 ```python
 import json
@@ -94,9 +94,11 @@ bs.brainstorm()
 print(f'Result:\n{json.dumps(bs.record, indent=2, ensure_ascii=False)}')
 ```
 
+Information related to a session is stored in `bs.record` as `dict`. You can extract items you want separately, or print/save an entire record as JSON.
+
 ### Step-by-Step Execution
 
-There is another way to use monju by calling each method step by step.
+There is another way to use monju by calling each process step by step.
 
 The following example works equivalently to the batch execution example above.
 
@@ -144,20 +146,19 @@ Types of `bs.status` are explained in later section.
 
 There are several parameters to set for `Monju` class:
 
-- System parameters:
-  - `api_keys` (str) **required**: API keys for LLMs in `LLMMaster` manner
+- Constractor parameters:
+  - `api_keys` (str): API keys for LLMs in `LLMMaster` manner
   - `verbose` (bool): print progress for debugging, default is `False`
-- Brainstorming parameters `params`:
+- Brainstorming parameters `params` as `dict`:
   - `theme` (str) **required**: theme or topic of brainstorming, a.k.a. prompt
   - `ideas` (int): number of ideas to generate by each LLM
-  - `freedom` (float): value of freedom-looking thinking for each LLM, a.k.a. temperature, between 0 and 1
+  - `freedom` (float): value of freedom-looking thinking for each LLM, a.k.a. temperature, between 0 and 1. Higher more free-thinking, lower more concervative.
   - `language` (str): language for output, default is `en` and must be followed by two-letter code defined in [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 
-As shown in the examples above, the brainstorming parameters are passed to `Monju` class as a dictionary. Use `pack_parameters` to format.
 
 ### Output Format
 
-Results are given in JSON format. Here is a real example of `print(bs.record)` given by the example code above.
+Results, `bs.record` in the examples, are given in `dict`. Here is an actual output.
 
 ```json
 {
@@ -239,25 +240,25 @@ Results are given in JSON format. Here is a real example of `print(bs.record)` g
 
 The `record` object contains the following information:
 
-- `input`: Input parameters for the brainstorming process.
-  - `theme`: same as the input parameter.
-  - `ideas`: same as the input parameter.
-  - `freedom`: same as the input parameter.
-  - `language`: same as the input parameter.
+- `input`:
+  - `theme`: same as one in the input parameter.
+  - `ideas`: same as one in the input parameter.
+  - `freedom`: same as one in the input parameter.
+  - `language`: same as one in the input parameter.
   - `idea_generation`: LLM information used for idea generation.
   - `mindmap`: LLM information used for mindmap generation.
   - `class_diagram`: LLM information used for class diagram generation.
   - `idea_evaluation`: LLM information used for idea evaluation.
-- `output`: Output results of the brainstorming process.
-  - `elapsed_time`: Elapsed time for each step: (1) idea generation, (2) mindmap and class diagram generation, (3) idea evaluation in this order.
-  - `ideas`: Generated ideas in dictionary format if multiple LLMs are used.
-  - `mindmap`: Mindmap of the generated ideas in mermaid format.
+- `output`:
+  - `elapsed_time`: Elapsed time in seconds as `list`: (1) idea generation, (2) mindmap and class diagram generation, (3) idea evaluation in this order. Mindmaps and class diagrams are generated in a single process, running simultaniously.
+  - `ideas`: Generated ideas in `dict`.
+  - `mindmap`: Mindmap of the generated ideas in Mermaid format.
   - `class_diagram`: Class diagram of the generated ideas in mermaid format.
   - `evaluation`: Evaluation of the generated ideas in dictionary format if multiple LLMs are used.
 
 ### Status
 
-On average, it takes about 30 seconds to complete a brainstorming process by monju.
+On average, one brainstorming session takes about 60 seconds to complete by monju.
 
 There are many calls of `print` in the step-by-step example. Each print shows a different status, which is useful to know progress.
 
@@ -289,9 +290,11 @@ Monju is capable of single or multiple LLMs for each step:
 - Organize ideas in mindmap and class diagram (single LLM)
 - Evaluate ideas (multiple/single LLM)
 
-You can configure which providers and models to use for each step. Set arguments of LLM information in `params` dictionary when call `generate_ideas(**params)`, `organize_ideas(**params)`, and `evaluate_ideas(**params)`. Not possible for `verify()` and `brainstorming()`.
+You can configure which providers and models to use for each step. Set arguments of LLM information in `params` dictionary by calling `generate_ideas(**params)`, `organize_ideas(**params)`, and `evaluate_ideas(**params)`.
 
-Note that providers are not limited to those shown above. Also possible to user other providers like MistralAI, Groq, and so on, as long as they are defined in `LLMMaster` class.
+This customization is not possible for the batch brainstorming.
+
+Note that providers are not limited to those shown above. Also possible to user other providers like MistralAI, Groq, Perplexity and so on, as possible as they are defined in `LLMMaster` class.
 
 ## Contributing
 

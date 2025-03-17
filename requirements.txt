@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 setuptools
 wheel
 twine
 flake8
 pytest
 llmmaster==1.0.0
+=======
+setuptools
+wheel
+twine
+flake8
+pytest
+llmmaster==1.0.0
+>>>>>>> 9073e3cb9f22d7edf5eab81d698a7d8bc7fb1bf0

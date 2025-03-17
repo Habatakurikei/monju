@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="monju",
-    version="0.2.0",
+    version="0.2.1",
     author="Daisuke Yamaguchi",
     author_email="daicom0204@gmail.com",
     description="A python library for brainstorming by multiple LLMs.",

@@ -24,6 +24,7 @@ PROGRESS_IDEA_GENERATION = "idea_generation"
 PROGRESS_NOT_STARTED = "not_started"
 PROGRESS_ORGANIZING = "organizing"
 PROGRESS_VERIFYING = "verifying"
+WAIT_FOR_STARTING = 0.1
 
 # Candidate LLM Models
 # - openai: gpt-4o-mini, gpt-4o

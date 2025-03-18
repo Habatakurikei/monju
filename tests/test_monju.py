@@ -117,8 +117,8 @@ def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
     api_keys = ''
     params = pack_parameters(
         theme=THEME,
-        ideas=20,
-        freedom=0.8,
+        ideas=18,
+        freedom=0.9,
         language="ja"
     )
 

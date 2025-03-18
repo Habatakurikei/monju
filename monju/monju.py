@@ -31,6 +31,7 @@ from .config import PROGRESS_IDEA_GENERATION
 from .config import PROGRESS_NOT_STARTED
 from .config import PROGRESS_ORGANIZING
 from .config import PROGRESS_VERIFYING
+from .config import WAIT_FOR_STARTING
 from .utils import print_record
 from .utils import remove_highlight
 from .utils import sanitize_mermaid
@@ -104,7 +105,7 @@ class Monju:
             print("Monju Step 1: Generating ideas...")
 
         try:
-            master = LLMMaster()
+            master = LLMMaster(wait_for_starting=WAIT_FOR_STARTING)
             master.set_api_keys(self.api_keys)
             master.summon(self._llm_ideation(**kwargs))
             master.run()
@@ -170,7 +171,7 @@ class Monju:
             print("Monju Step 3: Evaluating ideas...")
 
         try:
-            master = LLMMaster()
+            master = LLMMaster(wait_for_starting=WAIT_FOR_STARTING)
             master.set_api_keys(self.api_keys)
             master.summon(self._llm_evaluation(**kwargs))
             master.run()

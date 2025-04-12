@@ -9,6 +9,7 @@ from monju.config import DEFAULT_LANGUAGE
 from monju.config import KEY_CLASS_DIAGRAM
 from monju.config import KEY_FREEDOM
 from monju.config import KEY_IDEAS
+from monju.config import KEY_IDEA_REDUCTION
 from monju.config import KEY_INPUT
 from monju.config import KEY_LANGUAGE
 from monju.config import KEY_MINDMAP
@@ -96,7 +97,7 @@ def test_monju_batch(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         api_keys = load_api_keys()
 
-    bs = Monju(api_keys=api_keys, **params)
+    bs = Monju(api_keys=api_keys, verbose=True, reduction=False, **params)
 
     try:
         if run_api:
@@ -125,7 +126,7 @@ def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         api_keys = load_api_keys()
 
-    bs = Monju(api_keys=api_keys, verbose=True, **params)
+    bs = Monju(api_keys=api_keys, verbose=True, reduction=False, **params)
 
     try:
         if run_api:
@@ -133,7 +134,7 @@ def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
             bs.generate_ideas(**{
                 "openai_ideation": {
                     "provider": "openai",
-                    "model": "o3-mini"
+                    "model": "gpt-4.5-preview"
                 },
                 "anthropic_ideation": {
                     "provider": "anthropic",
@@ -144,6 +145,9 @@ def test_monju_step_by_step(run_api: bool, load_api_file: bool) -> None:
                     "model": "gemini-2.0-flash"
                 }
             })
+
+            print(f"Status: {bs.status}")
+            bs.reduce_ideas()
 
             print(f"Status: {bs.status}")
             bs.organize_ideas(**{
@@ -200,7 +204,7 @@ def test_monju_reasoning(run_api: bool, load_api_file: bool) -> None:
     if load_api_file:
         api_keys = load_api_keys()
 
-    bs = Monju(api_keys=api_keys, verbose=True, **params)
+    bs = Monju(api_keys=api_keys, verbose=True, reduction=True, **params)
 
     try:
         if run_api:
@@ -208,12 +212,22 @@ def test_monju_reasoning(run_api: bool, load_api_file: bool) -> None:
             bs.generate_ideas()
 
             print(f"Status: {bs.status}")
+            bs.reduce_ideas(**{
+                KEY_IDEA_REDUCTION: {
+                    "provider": "deepseek",
+                    "temperature": 0.0
+                }
+            })
+
+            print(f"Status: {bs.status}")
             bs.organize_ideas(**{
                 KEY_MINDMAP: {
-                    "provider": "deepseek"
+                    "provider": "deepseek",
+                    "temperature": 0.0
                 },
                 KEY_CLASS_DIAGRAM: {
-                    "provider": "deepseek"
+                    "provider": "deepseek",
+                    "temperature": 0.0
                 }
             })
 

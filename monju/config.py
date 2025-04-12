@@ -11,6 +11,8 @@ KEY_CLASS_DIAGRAM = "class_diagram"
 KEY_ELAPSED_TIME = "elapsed_time"
 KEY_EVALUATION = "evaluation"
 KEY_FREEDOM = "freedom"
+KEY_IDEA_LIST = "idea_list"
+KEY_IDEA_REDUCTION = "idea_reduction"
 KEY_IDEAS = "ideas"
 KEY_INPUT = "input"
 KEY_LANGUAGE = "language"
@@ -23,13 +25,11 @@ PROGRESS_IDEA_EVALUATION = "idea_evaluation"
 PROGRESS_IDEA_GENERATION = "idea_generation"
 PROGRESS_NOT_STARTED = "not_started"
 PROGRESS_ORGANIZING = "organizing"
+PROGRESS_REDUCING = "reducing"
 PROGRESS_VERIFYING = "verifying"
 WAIT_FOR_STARTING = 0.1
 
 # Candidate LLM Models
-# - openai: gpt-4o-mini, gpt-4o
-# - anthropic: claude-3-haiku-20240307, claude-3-5-sonnet-20241022
-# - google: gemini-1.5-flash, gemini-1.5-flash-exp-0827
 
 KEY_ANTHROPIC = "anthropic"
 KEY_GOOGLE = "google"
@@ -48,6 +48,13 @@ LLM_IDEA_GENERATION = {
         "provider": KEY_GOOGLE,
         "model": "gemini-1.5-flash",
     },
+}
+
+LLM_IDEA_REDUCTION = {
+    KEY_IDEA_REDUCTION: {
+        "provider": KEY_OPENAI,
+        "model": "gpt-4o",
+    }
 }
 
 LLM_MINDMAP = {
@@ -96,6 +103,19 @@ Theme: $theme
 
 Format:
 - Idea
+'''
+
+IDEA_REDUCTION_PROMPT = '''
+Purpose: Remove duplicate ideas from the "Idea List".
+
+Conditions:
+1. The language of the output is in $language of ISO 639-1 format.
+2. Return the results also in the same list format.
+3. Do not include your explanations.
+4. Do not add any unnecessary decorations to the bullet points.
+
+Idea List:
+$idea_list
 '''
 
 MINDMAP_GENERATION_PROMPT = '''

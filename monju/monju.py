@@ -9,10 +9,13 @@ from .config import DEFAULT_IDEAS
 from .config import DEFAULT_LANGUAGE
 from .config import EVALUATION_PROMPT
 from .config import IDEA_GENERATION_PROMPT
+from .config import IDEA_REDUCTION_PROMPT
 from .config import KEY_CLASS_DIAGRAM
 from .config import KEY_ELAPSED_TIME
 from .config import KEY_EVALUATION
 from .config import KEY_FREEDOM
+from .config import KEY_IDEA_LIST
+from .config import KEY_IDEA_REDUCTION
 from .config import KEY_IDEAS
 from .config import KEY_INPUT
 from .config import KEY_LANGUAGE
@@ -22,6 +25,7 @@ from .config import KEY_THEME
 from .config import LLM_CLASS_DIAGRAM
 from .config import LLM_IDEA_EVALUATION
 from .config import LLM_IDEA_GENERATION
+from .config import LLM_IDEA_REDUCTION
 from .config import LLM_MINDMAP
 from .config import MINDMAP_GENERATION_PROMPT
 from .config import PROGRESS_DONE
@@ -30,6 +34,7 @@ from .config import PROGRESS_IDEA_EVALUATION
 from .config import PROGRESS_IDEA_GENERATION
 from .config import PROGRESS_NOT_STARTED
 from .config import PROGRESS_ORGANIZING
+from .config import PROGRESS_REDUCING
 from .config import PROGRESS_VERIFYING
 from .config import WAIT_FOR_STARTING
 from .utils import print_record
@@ -45,6 +50,7 @@ class Monju:
         self,
         api_keys: str = '',
         verbose: bool = False,
+        reduction: bool = False,
         **kwargs
     ) -> None:
         """
@@ -52,6 +58,7 @@ class Monju:
           System parameters:
             api_keys (str): API keys for LLMs in LLMMaster manner
             verbose (bool): print progress for debugging
+            reduction (bool): remove duplicate ideas
           Brainstorming parameters as kwargs:
             theme (str) (required): theme or topic of brainstorming
             ideas (int): number of ideas to generate
@@ -73,6 +80,7 @@ class Monju:
 
         self.api_keys = api_keys
         self.verbose = verbose
+        self.reduction = reduction
         self.status = PROGRESS_NOT_STARTED
         self.record = {
             KEY_INPUT: kwargs,
@@ -87,6 +95,7 @@ class Monju:
         """
         try:
             self.generate_ideas()
+            self.reduce_ideas()
             self.organize_ideas()
             self.evaluate_ideas()
             self.verify()
@@ -115,6 +124,9 @@ class Monju:
                     extract_llm_response(value)
                 )
             self.record[KEY_OUTPUT][KEY_IDEAS] = master.results
+            self.record[KEY_OUTPUT][KEY_IDEA_LIST] = '\n'.join(
+                self.record[KEY_OUTPUT][KEY_IDEAS].values()
+            )
             self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
                 master.elapsed_time
             )
@@ -122,6 +134,38 @@ class Monju:
         except Exception as e:
             self.status = PROGRESS_FAILED
             msg = f"Error in idea generation: {e}"
+            raise Exception(msg) from e
+
+    def reduce_ideas(self, **kwargs) -> None:
+        """
+        Preprocessing for Step 2: remove duplicate ideas
+        """
+        if not self.reduction:
+            self.record[KEY_INPUT][KEY_IDEA_REDUCTION] = {}
+            self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(0)
+            return
+
+        self.status = PROGRESS_REDUCING
+
+        if self.verbose:
+            print("Preprocessing: Removing duplicate ideas...")
+
+        try:
+            master = LLMMaster()
+            master.set_api_keys(self.api_keys)
+            master.summon(self._llm_reduction(**kwargs))
+            master.run()
+
+            self.record[KEY_OUTPUT][KEY_IDEA_LIST] = extract_llm_response(
+                master.results[KEY_IDEA_REDUCTION]
+            )
+            self.record[KEY_OUTPUT][KEY_ELAPSED_TIME].append(
+                master.elapsed_time
+            )
+
+        except Exception as e:
+            self.status = PROGRESS_FAILED
+            msg = f"Error in idea reduction: {e}"
             raise Exception(msg) from e
 
     def organize_ideas(self, **kwargs) -> None:
@@ -240,6 +284,28 @@ class Monju:
 
         return entries
 
+    def _llm_reduction(self, **kwargs) -> dict:
+        """
+        LLM configuration for idea reduction.
+        """
+        buff = kwargs.copy() if kwargs else LLM_IDEA_REDUCTION.copy()
+        llm_config = {KEY_IDEA_REDUCTION: buff[KEY_IDEA_REDUCTION]}
+
+        self.record[KEY_INPUT][KEY_IDEA_REDUCTION] = llm_config
+
+        prompt = Template(IDEA_REDUCTION_PROMPT).safe_substitute(
+            idea_list=self.record[KEY_OUTPUT][KEY_IDEA_LIST],
+            language=self.record[KEY_INPUT][KEY_LANGUAGE]
+        )
+
+        if self.verbose:
+            print(f"Prompt:\n{prompt}")
+
+        for _, parameters in llm_config.items():
+            parameters["prompt"] = prompt
+
+        return llm_config
+
     def _llm_mindmap(self, **kwargs) -> dict:
         """
         LLM configuration for mindmap generation.
@@ -249,10 +315,9 @@ class Monju:
 
         self.record[KEY_INPUT][KEY_MINDMAP] = llm_config
 
-        idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
         prompt = Template(MINDMAP_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
-            idea_list=idea_list,
+            idea_list=self.record[KEY_OUTPUT][KEY_IDEA_LIST],
             language=self.record[KEY_INPUT][KEY_LANGUAGE]
         )
 
@@ -274,10 +339,9 @@ class Monju:
 
         self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = llm_config
 
-        idea_list = '\n'.join(self.record[KEY_OUTPUT][KEY_IDEAS].values())
         prompt = Template(CLASS_DIAGRAM_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
-            idea_list=idea_list,
+            idea_list=self.record[KEY_OUTPUT][KEY_IDEA_LIST],
             language=self.record[KEY_INPUT][KEY_LANGUAGE]
         )
 

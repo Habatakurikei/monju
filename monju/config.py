@@ -93,11 +93,10 @@ Purpose: Generate $ideas ideas on the following "Theme" and meeting the "Conditi
 
 Conditions:
 1. Propose ideas with free thinking.
-2. Consider the 5W1H.
-3. Return the results in bullet points as shown in the "Format".
-4. The language of the output is in $language of ISO 639-1 format.
-5. Do not include your explanations.
-6. Do not add any unnecessary decorations to the bullet points.
+2. Return the results in bullet points as shown in the "Format".
+3. The language of the output is in $language of ISO 639-1 format.
+4. Do not include your explanations.
+5. Do not add any unnecessary decorations to the bullet points.
 
 Theme: $theme
 

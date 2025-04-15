@@ -39,7 +39,8 @@ from .config import PROGRESS_VERIFYING
 from .config import WAIT_FOR_STARTING
 from .utils import print_record
 from .utils import remove_highlight
-from .utils import sanitize_mermaid
+#from .utils import sanitize_mermaid
+from .utils import strip_mermaid
 
 
 class Monju:
@@ -185,12 +186,12 @@ class Monju:
             master.summon(self._llm_class_diagram(**kwargs))
             master.run()
 
-            buff = sanitize_mermaid(
+            buff = strip_mermaid(
                 extract_llm_response(master.results[KEY_MINDMAP])
             )
             self.record[KEY_OUTPUT][KEY_MINDMAP] = buff
 
-            buff = sanitize_mermaid(
+            buff = strip_mermaid(
                 extract_llm_response(master.results[KEY_CLASS_DIAGRAM])
             )
             self.record[KEY_OUTPUT][KEY_CLASS_DIAGRAM] = buff

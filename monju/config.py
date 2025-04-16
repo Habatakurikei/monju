@@ -38,7 +38,7 @@ KEY_OPENAI = "openai"
 LLM_IDEA_GENERATION = {
     KEY_OPENAI: {
         "provider": KEY_OPENAI,
-        "model": "gpt-4o-mini",
+        "model": "gpt-4.1-nano",
     },
     KEY_ANTHROPIC: {
         "provider": KEY_ANTHROPIC,
@@ -52,19 +52,16 @@ LLM_IDEA_GENERATION = {
 
 LLM_IDEA_REDUCTION = {
     KEY_IDEA_REDUCTION: {
-        "provider": KEY_OPENAI,
-        "model": "gpt-4o",
+        "provider": KEY_GOOGLE,
+        "model": "gemini-2.0-flash",
     }
 }
 
-LLM_MINDMAP = {
+LLM_IDEA_ORGANIZATION = {
     KEY_MINDMAP: {
         "provider": KEY_OPENAI,
         "model": "gpt-4o",
     },
-}
-
-LLM_CLASS_DIAGRAM = {
     KEY_CLASS_DIAGRAM: {
         "provider": KEY_OPENAI,
         "model": "gpt-4o",
@@ -74,7 +71,7 @@ LLM_CLASS_DIAGRAM = {
 LLM_IDEA_EVALUATION = {
     KEY_OPENAI: {
         "provider": KEY_OPENAI,
-        "model": "gpt-4o-mini",
+        "model": "gpt-4.1-nano",
     },
     KEY_ANTHROPIC: {
         "provider": KEY_ANTHROPIC,
@@ -82,7 +79,7 @@ LLM_IDEA_EVALUATION = {
     },
     KEY_GOOGLE: {
         "provider": KEY_GOOGLE,
-        "model": "gemini-1.5-flash",
+        "model": "gemini-2.0-flash",
     },
 }
 

@@ -235,7 +235,7 @@ def test_monju_reasoning(run_api: bool, load_api_file: bool) -> None:
             bs.evaluate_ideas(**{
                 "openai": {
                     "provider": "openai",
-                    "model": "o3-mini",
+                    "model": "o4-mini",
                     "reasoning_effort": "high"
                 },
                 "anthropic": {

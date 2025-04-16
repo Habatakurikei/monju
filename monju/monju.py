@@ -22,11 +22,10 @@ from .config import KEY_LANGUAGE
 from .config import KEY_MINDMAP
 from .config import KEY_OUTPUT
 from .config import KEY_THEME
-from .config import LLM_CLASS_DIAGRAM
 from .config import LLM_IDEA_EVALUATION
 from .config import LLM_IDEA_GENERATION
+from .config import LLM_IDEA_ORGANIZATION
 from .config import LLM_IDEA_REDUCTION
-from .config import LLM_MINDMAP
 from .config import MINDMAP_GENERATION_PROMPT
 from .config import PROGRESS_DONE
 from .config import PROGRESS_FAILED
@@ -39,7 +38,7 @@ from .config import PROGRESS_VERIFYING
 from .config import WAIT_FOR_STARTING
 from .utils import print_record
 from .utils import remove_highlight
-#from .utils import sanitize_mermaid
+# from .utils import sanitize_mermaid
 from .utils import strip_mermaid
 
 
@@ -266,9 +265,9 @@ class Monju:
         """
         LLM configuration for idea generation.
         """
-        entries = kwargs.copy() if kwargs else LLM_IDEA_GENERATION.copy()
+        llm_config = kwargs if kwargs else LLM_IDEA_GENERATION
 
-        self.record[KEY_INPUT][PROGRESS_IDEA_GENERATION] = entries
+        self.record[KEY_INPUT][PROGRESS_IDEA_GENERATION] = llm_config
 
         prompt = Template(IDEA_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
@@ -279,20 +278,20 @@ class Monju:
         if self.verbose:
             print(f"Prompt:\n{prompt}")
 
-        for _, parameters in entries.items():
+        for _, parameters in llm_config.items():
             parameters["prompt"] = prompt
             parameters["temperature"] = self.record[KEY_INPUT][KEY_FREEDOM]
 
-        return entries
+        return llm_config
 
     def _llm_reduction(self, **kwargs) -> dict:
         """
         LLM configuration for idea reduction.
         """
-        buff = kwargs.copy() if kwargs else LLM_IDEA_REDUCTION.copy()
-        llm_config = {KEY_IDEA_REDUCTION: buff[KEY_IDEA_REDUCTION]}
+        llm_config = kwargs if kwargs else LLM_IDEA_REDUCTION
 
-        self.record[KEY_INPUT][KEY_IDEA_REDUCTION] = llm_config
+        self.record[KEY_INPUT][KEY_IDEA_REDUCTION] = \
+            llm_config[KEY_IDEA_REDUCTION]
 
         prompt = Template(IDEA_REDUCTION_PROMPT).safe_substitute(
             idea_list=self.record[KEY_OUTPUT][KEY_IDEA_LIST],
@@ -311,10 +310,13 @@ class Monju:
         """
         LLM configuration for mindmap generation.
         """
-        buff = kwargs.copy() if KEY_MINDMAP in kwargs else LLM_MINDMAP.copy()
-        llm_config = {KEY_MINDMAP: buff[KEY_MINDMAP]}
+        llm_config = {
+            KEY_MINDMAP: kwargs[KEY_MINDMAP]
+            if KEY_MINDMAP in kwargs
+            else LLM_IDEA_ORGANIZATION[KEY_MINDMAP]
+        }
 
-        self.record[KEY_INPUT][KEY_MINDMAP] = llm_config
+        self.record[KEY_INPUT][KEY_MINDMAP] = llm_config[KEY_MINDMAP]
 
         prompt = Template(MINDMAP_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
@@ -334,11 +336,14 @@ class Monju:
         """
         LLM configuration for class diagram generation.
         """
-        buff = kwargs.copy() if KEY_CLASS_DIAGRAM in kwargs else \
-            LLM_CLASS_DIAGRAM.copy()
-        llm_config = {KEY_CLASS_DIAGRAM: buff[KEY_CLASS_DIAGRAM]}
+        llm_config = {
+            KEY_CLASS_DIAGRAM: kwargs[KEY_CLASS_DIAGRAM]
+            if KEY_CLASS_DIAGRAM in kwargs
+            else LLM_IDEA_ORGANIZATION[KEY_CLASS_DIAGRAM]
+        }
 
-        self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = llm_config
+        self.record[KEY_INPUT][KEY_CLASS_DIAGRAM] = \
+            llm_config[KEY_CLASS_DIAGRAM]
 
         prompt = Template(CLASS_DIAGRAM_GENERATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
@@ -358,8 +363,9 @@ class Monju:
         """
         LLM configuration for idea evaluation.
         """
-        entries = kwargs.copy() if kwargs else LLM_IDEA_EVALUATION.copy()
-        self.record[KEY_INPUT][PROGRESS_IDEA_EVALUATION] = entries
+        llm_config = kwargs if kwargs else LLM_IDEA_EVALUATION
+
+        self.record[KEY_INPUT][PROGRESS_IDEA_EVALUATION] = llm_config
 
         prompt = Template(EVALUATION_PROMPT).safe_substitute(
             theme=self.record[KEY_INPUT][KEY_THEME],
@@ -370,7 +376,7 @@ class Monju:
         if self.verbose:
             print(f"Prompt:\n{prompt}")
 
-        for _, parameters in entries.items():
+        for _, parameters in llm_config.items():
             parameters["prompt"] = prompt
 
-        return entries
+        return llm_config
